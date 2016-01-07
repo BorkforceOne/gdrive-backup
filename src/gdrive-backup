@@ -1,0 +1,40 @@
+#!/bin/bash
+
+PATH=/usr/local/sbin:/usr/local/bin:/sbin:/bin:/usr/sbin:/usr/bin
+
+SERVER_NAME=eclipse
+BACKUP_DIR=$1
+BACKUP_PREFIX=$2
+REMOTE_DIR=/LTS/Server-Backups/$SERVER_NAME
+MAIL_TO=bjg96@nau.edu
+MAIL_SUBJECT="Server Backup: Fail"
+MAIL_BODY=/home/bjg96/.config/gdrive-backup/mail-body
+TMP_DIR=/tmp
+
+### Auto Generated using the above values ###
+BACKUP_FNAME=${BACKUP_PREFIX}_$(date +%Y%m%d-%H_%M_%S).tar.gz
+BACKUP_FILE=${TMP_DIR}/${BACKUP_FNAME}
+REMOTE_FILE=${REMOTE_DIR}/${BACKUP_FNAME}
+
+notify_email() {
+    MSG=$(sed -e "s%BACKUP_DIR%$BACKUP_DIR%g" \
+        -e "s%SERVER_NAME%$SERVER_NAME%g" \
+        ${MAIL_BODY})
+
+    printf "${MSG}" | mailx -v -A webmaster -s "${MAIL_SUBJECT}" ${MAIL_TO}
+}
+
+cd $BACKUP_DIR && tar czfv $BACKUP_FILE . && skicka upload $BACKUP_FILE $REMOTE_FILE
+
+if [ $? -ne 0 ]; then
+    MAIL_BODY=/home/bjg96/.config/gdrive-backup/mail-body
+    MAIL_SUBJECT="Server Backup: Fail"
+    notify_email
+else
+    MAIL_BODY=/home/bjg96/.config/gdrive-backup/mail-body-success
+    MAIL_SUBJECT="Server Backup: Success"
+    notify_email
+fi
+
+rm $BACKUP_FILE
+
