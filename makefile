@@ -9,7 +9,7 @@ clean:
 
 build: out
 	@echo "***Building***"
-	cp src/* out 
+	cp -rf src/* out
 
 install: out/gdrive-backup
 	@echo "***Installing***"
