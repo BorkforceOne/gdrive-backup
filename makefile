@@ -18,8 +18,8 @@ install: out/gdrive-backup
 ##
 
 out/gdrive-backup:
-	make build
 	@echo "***No build found, rebuilding***"
+	make build
 
 out: 
 	mkdir out
